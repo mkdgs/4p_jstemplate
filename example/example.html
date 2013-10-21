@@ -1,0 +1,32 @@
+// need jquery & 4p template libs
+
+<div id="template">
+    <h1>my loop</h1>
+    <ul>
+        <script> 
+        while ( l = data.is('list').iterate() ) {
+            print('<li> '+l.v()+' </li>');           
+        } 
+        </script>
+    </ul>
+    <b>short print: {{=data.is('bar').v() }} </b><br/>
+    <b>traverse data tree: {{=data.is('deep','foo','bar').v() }} </b>
+<div>
+
+<script>
+
+jQuery(function() {
+  var $ = jQuery;
+  var template_data = {
+    bar : 'youpi',
+    list : [ 'hop', 'hip', 'hap' ],
+    deep : { 'foo' : { 'bar' : 'data' } }
+  };
+  
+  
+  var my_tpl = $4p.tpl($('#template').html());
+  $('#template').html(my_tpl.render(template_data));
+  
+});
+
+</script>
