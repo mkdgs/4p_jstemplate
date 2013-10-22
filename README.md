@@ -4,5 +4,4 @@
 javascript ports of 4p template engine
 
 test it:
-http://jsfiddle.net/JYUjm/10/
-
+http://jsfiddle.net/JYUjm/11/
