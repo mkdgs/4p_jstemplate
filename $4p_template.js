@@ -1,11 +1,10 @@
 /*
 * 4p javascript template ports 
-* version : 0.1
+* version : 0.2
 * Copyright Desgranges Mickael
 * mickael@mkdgs.fr
 */
-
-if ( !$4p ) $4p = {};
+$4p = {};
 $4p.tpl = function(tpl) {
     var f = {};
     if (typeof tpl == 'string') {
@@ -30,23 +29,36 @@ $4p.tpl = function(tpl) {
     f.scope = {
         root : f.tpl
     };
-    f.element = $('<div />').append(f.tpl);
+    
+    f.element = document.createElement('div');
+    f.element.innerHTML = f.tpl;
+    f.element = $(f.element);
     f.element.find('[data-fp-scope]').each(
             function() {
-                f.scope[$(this).attr('data-fp-scope')] = $('<div />').append(
+                f.scope[$(this).attr('data-fp-scope')] = $('<textarea />').append(
                         $(this)).html();
             });
 
     f.cache = {};
-    f.render = function(data, scope) {
+    f.render = function(data, scope, data_key) {
         var err = "", func;
-        if (!scope)
-            scope = 'root';
+        if (!scope)    scope = 'root';
+        if (!data_key) data_key = 'data';
+        var tpl_data = {};
+        tpl_data[data_key] = new $4p.templateData(data);
         try {
             if (typeof f.cache[scope] != 'function') {
                 // inspired by http://www.west-wind.com/weblog/posts/509108.aspx
-                var strFunc = "var p=[];var data = arguments[0].data;var print = function(str) { p.push(str); }; p.push('"
-                        + f.tpl.replace(/[\r\t\n]/g, " ")
+                
+                // put all data in function scope
+                // i don't know if it's better than with(), but with can be "not forwad compatble"
+                // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/with
+                var strFunc =  "for ( var x in  arguments[0] ) {"
+                +"   eval('var ' + x + ' = arguments[0][x];'); "
+                +"} "
+                
+                strFunc +="var p=[]; var print = function(str) { p.push(str); }; p.push('"
+                        + f.scope[scope].replace(/[\r\t\n]/g, " ")
                          .split("'")
                          .join("\\'")
                         .replace(/<script>/g, "{{")
@@ -54,11 +66,8 @@ $4p.tpl = function(tpl) {
                         .replace(/{{=([^}{2}]+)}}/g, function (m, p1) { return "'+"+p1.split("\\'").join("'")+"+'"; })
                         .replace(/{{(.+?)}}/g, function (m, p1) { return "');"+p1.split("\\'").join("'")+";p.push('"; })
                         +"');return p.join('');";
-                f.cache[scope] = new Function("obj", strFunc);
+                f.cache[scope] = new Function('template_data', strFunc);
             }
-            var tpl_data = {
-                    data : new $4p.templateData(data)
-            };
             return f.cache[scope](tpl_data);
         } catch (e) {
             err = e.message;
@@ -211,6 +220,6 @@ $4p.templateData = function(vars, key) {
         }
         this.i_total = this.i_iterate = null;
         this.reset();
-    };
+ };
 
 };
