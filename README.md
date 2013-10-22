@@ -2,7 +2,7 @@
 =============
 
 test it:
-http://jsfiddle.net/JYUjm/11/
+http://jsfiddle.net/mkdgs/FvBnX/
 
 i've made this template engine, with some idea similar to handlebar, but all presentational template logic is in javascript 
 (we have don't need to learn a new template language again) and it's easy to mix html and javascript, like php with html.
