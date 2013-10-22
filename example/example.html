@@ -29,18 +29,18 @@
 
 $(function(){
     var template_data = {
-        bar : 'youpi',   
+        bar : 'youpi',
         deep : { 'foo' : { 'bar' : 'data' } },
         list : [ 'hop', 'hip', 'hap', 'yip' , 'yep']
     };
 
-    $(function () {       
+    $(function () {
         var my_tpl = $4p.tpl($('#template').html());
         $('#template').html(my_tpl.render(template_data));
     
         $(document).on('click', '#add', function () {
             $('[data-fp-scope=scoped-part]').first().before(my_tpl.render('awesome data !', 'scoped-part', 'loopdata'));
         });
+    });
 });
-
 </script>
