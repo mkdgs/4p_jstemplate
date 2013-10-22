@@ -1,8 +1,12 @@
 // need jquery & 4p template libs
 
 <div id="template">    
+    https//github.com/mkdgs/4p_jstemplate/
+    <br/>
+    <br/>
     <b>short print: {{=data.is('bar').v() }} </b><br/>
     <b>traverse data tree: {{=data.is('deep','foo','bar').v() }} </b>
+    <br/>
     <h1>iterate loop</h1>
     <ul>
         <script> 
@@ -22,6 +26,17 @@
               {{=loopdata.v()}}
             </li>           
         <script> } </script>        
+    </ul>
+    
+    <br />
+    
+    <h1>Alternative syntaxe</h1>
+    <ul>
+        {{ while ( l = data.is('list').iterate() ) { }}
+        <li>
+              {{=l.v()}}  
+        </li>        
+        {{ } }}
     </ul>
 <div>
 
