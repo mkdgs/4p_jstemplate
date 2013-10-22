@@ -1,7 +1,9 @@
 // need jquery & 4p template libs
 
-<div id="template">
-    <h1>my loop</h1>
+<<div id="template">    
+    <b>short print: {{=data.is('bar').v() }} </b><br/>
+    <b>traverse data tree: {{=data.is('deep','foo','bar').v() }} </b>
+    <h1>iterate loop</h1>
     <ul>
         <script> 
         while ( l = data.is('list').iterate() ) {
@@ -9,24 +11,36 @@
         } 
         </script>
     </ul>
-    <b>short print: {{=data.is('bar').v() }} </b><br/>
-    <b>traverse data tree: {{=data.is('deep','foo','bar').v() }} </b>
+    
+   
+    break code déclaration
+    <h1>iterate loop</h1>
+    <button id="add">add item</button>
+    <ul>
+        <script> while ( loopdata = data.is('list').iterate() ) { </script>
+            <li id="{{=loopdata.v()}}" data-fp-scope="scoped-part"> some html  code ...
+              {{=loopdata.v()}}
+            </li>           
+        <script> } </script>        
+    </ul>
 <div>
 
 <script>
 
-jQuery(function() {
-  var $ = jQuery;
-  var template_data = {
-    bar : 'youpi',
-    list : [ 'hop', 'hip', 'hap' ],
-    deep : { 'foo' : { 'bar' : 'data' } }
-  };
-  
-  
-  var my_tpl = $4p.tpl($('#template').html());
-  $('#template').html(my_tpl.render(template_data));
-  
+$(function(){
+    var template_data = {
+        bar : 'youpi',   
+        deep : { 'foo' : { 'bar' : 'data' } },
+        list : [ 'hop', 'hip', 'hap', 'yip' , 'yep']
+    };
+
+    $(function () {       
+        var my_tpl = $4p.tpl($('#template').html());
+        $('#template').html(my_tpl.render(template_data));
+    
+        $(document).on('click', '#add', function () {
+            $('[data-fp-scope=scoped-part]').first().before(my_tpl.render('awesome data !', 'scoped-part', 'loopdata'));
+        });
 });
 
 </script>
