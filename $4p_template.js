@@ -130,7 +130,7 @@ $4p.templateData = function(vars, key) {
         return this.value();
     };
     this.e = function() {
-        document.write(this.value());
+        print(this.value());
     };
 
     /*
