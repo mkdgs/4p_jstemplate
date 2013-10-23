@@ -98,6 +98,9 @@ $4p.templateData = function(vars, key) {
                 if (vars.hasOwnProperty(k)) {
                     v = vars[k];
                     this.vars[k] = new $4p.templateData(v, k);
+                    // reference the data index
+                    if ( !this[k] ) this[k] = this.vars[k];
+
                 }
             }
         }
@@ -130,7 +133,11 @@ $4p.templateData = function(vars, key) {
         return this.value();
     };
     this.e = function() {
-        print(this.value());
+        return this.value();
+    };
+    
+    this.toString = function () {
+      return this.value();  
     };
 
     /*
