@@ -91,7 +91,9 @@ $4p.templateData = function(vars, key) {
     this.constructor = function(vars, key) {
         var k, v;
         this.key = (key) ? key : null;
-        if (vars.instanceOfTemplateData) {
+        if ( typeof vars === 'undefined' ) {
+          this.vars = null;   
+        } else if (vars.instanceOfTemplateData) {
             this.vars = vars.vars;
         } else if ((/boolean|number|string/).test(typeof vars)) {
             this.vars = vars;
@@ -146,15 +148,15 @@ $4p.templateData = function(vars, key) {
      * ITERATOR
      */
     this.currentKey = 0;
-    if (!this.vars.instanceOfTemplateData) {
+    if ( this.vars && this.vars.instanceOfTemplateData) {
+        this.keys = this.vars.keys;        
+    } else {
         this.keys = [];
         for ( var key in this.vars) {
             if (this.vars.hasOwnProperty(key)) {
                 this.keys.push(key);
             }
         }
-    } else {
-        this.keys = this.vars.keys;
     }
 
     this.end = function() {
