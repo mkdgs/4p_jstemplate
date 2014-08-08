@@ -4,8 +4,8 @@
 * Copyright Desgranges Mickael
 * mickael@mkdgs.fr
 */
-$4p = {};
-$4p.tpl = function(tpl) {
+if ( !$4p ) $4p = {};
+$4p.template = function(tpl) {
     var f = {};
     if (typeof tpl == 'string') {
         if (tpl.substring(0, 4) == 'http') {
