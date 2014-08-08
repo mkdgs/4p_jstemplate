@@ -4,7 +4,7 @@
 * Copyright Desgranges Mickael
 * mickael@mkdgs.fr
 */
-if ( !$4p ) $4p = {};
+if ( typeof $4p !== 'object' ) var $4p = {};
 $4p.template = function(tpl) {
     var f = {};
     if (typeof tpl == 'string') {
