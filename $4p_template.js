@@ -48,16 +48,7 @@ $4p.tpl = function(tpl) {
         tpl_data[data_key] = new $4p.templateData(data);
         try {
             if (typeof f.cache[scope] != 'function') {
-                // inspired by http://www.west-wind.com/weblog/posts/509108.aspx
-                
-                // put all data in function scope
-                // i don't know if it's better than with(), but with can be "not forwad compatble"
-                // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/with
-                var strFunc =  "for ( var x in  arguments[0] ) {"
-                +"   eval('var ' + x + ' = arguments[0][x];'); "
-                +"} "
-                
-                strFunc +="var p=[]; var print = function(str) { p.push(str); }; p.push('"
+                strFunc ="var p=[]; var print = function(str) { p.push(str); }; p.push('"
                         + f.scope[scope].replace(/[\r\t\n]/g, " ")
                          .split("'")
                          .join("\\'")
@@ -66,9 +57,20 @@ $4p.tpl = function(tpl) {
                         .replace(/{{=([^}{2}]+)}}/g, function (m, p1) { return "'+"+p1.split("\\'").join("'")+"+'"; })
                         .replace(/{{(.+?)}}/g, function (m, p1) { return "');"+p1.split("\\'").join("'")+";p.push('"; })
                         +"');return p.join('');";
-                f.cache[scope] = new Function('template_data', strFunc);
+               
+               var args = [];                
+                for (var x in tpl_data) {
+                        args.push(x);
+                }
+                f.cache[scope] = new Function(args, strFunc);
             }
-            return f.cache[scope](tpl_data);
+                       
+            var args_value = [];
+            for (var x in tpl_data) {
+                args_value.push(tpl_data[x]);
+            }
+           
+            return f.cache[scope].apply(this, args_value);
         } catch (e) {
             err = e.message;
         }
