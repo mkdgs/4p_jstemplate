@@ -30,3 +30,20 @@ return the data value passed in template contained in this object
 give me a feedback  ;)
 
 
+now work with node Js ! 
+stuff in node_js/
+```
+// view engine setup
+var fs = require('fs'); // this engine requires the fs module
+app.engine('html', function (filePath, options, callback) { // define the template engine
+  fs.readFile(filePath, function (err, content) {
+    if (err) throw new Error(err);
+    
+     var my_tpl = $4p_template.template(content.toString());
+     var rendered = my_tpl.render(options);
+     return callback(null, rendered);
+  });
+});
+app.set('views', path.join(__dirname, 'views')); // specify the views directory
+app.set('view engine', 'html'); // register the template engine
+```
