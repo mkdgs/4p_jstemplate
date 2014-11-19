@@ -33,6 +33,10 @@ give me a feedback  ;)
 now work with node Js ! 
 stuff in node_js/
 ```
+// set template engine for express on node Js
+
+var $4p_template = require('4p_template');
+
 // view engine setup
 var fs = require('fs'); // this engine requires the fs module
 app.engine('html', function (filePath, options, callback) { // define the template engine
