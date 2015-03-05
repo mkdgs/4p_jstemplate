@@ -48,7 +48,7 @@ $4p.template = function(tpl) {
         tpl_data[data_key] = new $4p.templateData(data);
         try {
             if (typeof f.cache[scope] != 'function') {
-                strFunc ="var p=[]; var print = function(str) { p.push(str); }; p.push('"
+                var strFunc ="var p=[]; var print = function(str) { p.push(str); }; p.push('"
                         + f.scope[scope].replace(/[\r\t\n]/g, " ")
                          .split("'")
                          .join("\\'")
@@ -89,9 +89,9 @@ $4p.templateData = function(vars, key) {
     this.instanceOfTemplateData = true;
 
     this.constructor = function(vars, key) {
-        var k, v;
+        var k, v, vars = vars || {};
         this.key = (key) ? key : null;
-        if ( typeof vars === 'undefined' ) {
+        if ( vars.instanceOfTemplateData === true ) {
           this.vars = null;   
         } else if (vars.instanceOfTemplateData) {
             this.vars = vars.vars;
