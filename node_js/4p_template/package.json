@@ -1,7 +1,7 @@
 {
   "name": "4p_template",
-  "version": "0.0.0",
-  "description": "4p template engine ports",
+  "version": "0.3.0",
+  "description": "A template Engine for Express/NodeJs",
   "main": "nodejs_4p_template.js",
   "dependencies": {
     "jsdom": "1.3.1",
