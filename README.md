@@ -7,7 +7,7 @@ http://jsfiddle.net/mkdgs/FvBnX/
 i've made this template engine, with some idea similar to handlebar, but all presentational template logic is in javascript 
 (we have don't need to learn a new template language again) and it's easy to mix html and javascript, like php with html.
 
-you can reuse your template and define repetitive subpart of it 
+you can reuse your template and define repetitive subpart of it.
 
 in template all data is mapped to a $4p.templateData object and has three method is(), iterate(), v()
 
@@ -50,3 +50,6 @@ app.engine('html', function (filePath, options, callback) { // define the templa
 app.set('views', path.join(__dirname, 'views')); // specify the views directory
 app.set('view engine', 'html'); // register the template engine
 ```
+
+The templating part is inspired, like many other, from our Guru:
+http://ejohn.org/blog/javascript-micro-templating/
