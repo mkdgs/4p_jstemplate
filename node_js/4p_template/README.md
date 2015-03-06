@@ -2,6 +2,25 @@
 =============
 [![4p Logo](https://oupla.bienla.com/mkdgs/4p_logo.png)](http://mkdgs.fr/)
 
+```
+// set template engine for express on node Js
+
+var $4p_template = require('4p_template');
+
+// view engine setup
+var fs = require('fs'); // this engine requires the fs module
+app.engine('html', function (filePath, options, callback) { // define the template engine
+  fs.readFile(filePath, function (err, content) {
+    if (err) throw new Error(err);
+    
+     var my_tpl = $4p_template.template(content.toString());
+     var rendered = my_tpl.render(options);
+     return callback(null, rendered);
+  });
+});
+app.set('views', path.join(__dirname, 'views')); // specify the views directory
+app.set('view engine', 'html'); // register the template engine
+```
 
 test it:
 http://jsfiddle.net/mkdgs/FvBnX/
@@ -31,27 +50,7 @@ return the data value passed in template contained in this object
 give me a feedback  ;)
 
 
-now work with Express/NodeJs ! 
-stuff in node_js/
-```
-// set template engine for express on node Js
 
-var $4p_template = require('4p_template');
-
-// view engine setup
-var fs = require('fs'); // this engine requires the fs module
-app.engine('html', function (filePath, options, callback) { // define the template engine
-  fs.readFile(filePath, function (err, content) {
-    if (err) throw new Error(err);
-    
-     var my_tpl = $4p_template.template(content.toString());
-     var rendered = my_tpl.render(options);
-     return callback(null, rendered);
-  });
-});
-app.set('views', path.join(__dirname, 'views')); // specify the views directory
-app.set('view engine', 'html'); // register the template engine
-```
 
 The templating part is inspired, like many other, from our Guru:
 http://ejohn.org/blog/javascript-micro-templating/
