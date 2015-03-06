@@ -6,22 +6,23 @@ var $ = require("jquery")(jsdom.jsdom().parentWindow);
 var jQuery = $;
 
 /*
-* 4p javascript template ports 
-* version : 0.2
-* Copyright Desgranges Mickael
-* mickael@mkdgs.fr
-*/
-if ( typeof $4p !== 'object' ) var $4p = {};
-$4p.template = function(tpl) {
+ * 4p javascript template ports 
+ * version : 0.3
+ * Copyright Desgranges Mickael
+ * mickael@mkdgs.fr
+ */
+if (typeof $4p !== 'object')
+    var $4p = {};
+$4p.template = function (tpl) {
     var f = {};
     if (typeof tpl == 'string') {
         if (tpl.substring(0, 4) == 'http') {
             $.ajax({
-                cache : true,
-                url : tpl + $4p.skipCache(),
-                dataType : 'text',
-                async : false,
-                success : function(d) {
+                cache: true,
+                url: tpl + ( ($4p.skipCache ) ?  $4p.skipCache() : '' ),
+                dataType: 'text',
+                async: false,
+                success: function (d) {
                     f.tpl = d;
                 }
             });
@@ -33,92 +34,103 @@ $4p.template = function(tpl) {
         return;
     }
     // test scope part
-    f.scope = {
-        root : f.tpl
-    };
-    
+    f.scope = {};
     f.element = document.createElement('div');
     f.element.innerHTML = f.tpl;
     f.element = $(f.element);
+    var $textarea = $('<textarea />');
     f.element.find('[data-fp-scope]').each(
-            function() {
-                var el = document.createElement('div');
-                f.scope[$(this).attr('data-fp-scope')] = $(this)[0].outerHTML;
+            function () {
+                var scope = $(this).attr('data-fp-scope')
+                $(this).parent().attr('data-fp-scope-parent', scope);
+                f.scope[scope] = $textarea.append($(this)).html();                
+                $textarea.html('');
+                if ($(this)[0].hasAttribute('data-fp-remove'))
+                    $(this).remove();                
             });
+    f.scope['root'] = $textarea.append(f.element).html();
 
     f.cache = {};
-    f.render = function(data, scope, data_key) {
+    f.render = function (data, scope, data_key) {
         var err = "", func;
-        if (!scope)    scope = 'root';
-        if (!data_key) data_key = 'data';
+        if (!scope)
+            scope = 'root';
+        if (!data_key)
+            data_key = 'data';
         var tpl_data = {};
         tpl_data[data_key] = new $4p.templateData(data);
         try {
             if (typeof f.cache[scope] != 'function') {
-                strFunc ="var p=[]; var print = function(str) { p.push(str); }; p.push('"
+                var strFunc = "var p=[]; var print = function(str) { p.push(str); }; p.push('"
                         + f.scope[scope].replace(/[\r\t\n]/g, " ")
-                         .split("'")
-                         .join("\\'")
+                        .split("'")
+                        .join("\\'")
                         .replace(/<script>/g, "{{")
                         .replace(/<\/script>/g, "}}")
-                        .replace(/{{=([^}{2}]+)}}/g, function (m, p1) { return "'+"+p1.split("\\'").join("'")+"+'"; })
-                        .replace(/{{(.+?)}}/g, function (m, p1) { return "');"+p1.split("\\'").join("'")+";p.push('"; })
-                        +"');return p.join('');";
-               
-               var args = [];                
+                        .replace(/{{=([^}{2}]+)}}/g, function (m, p1) {
+                            return "'+" + p1.split("\\'").join("'") + "+'";
+                        })
+                        .replace(/{{(.+?)}}/g, function (m, p1) {
+                            return "');" + p1.split("\\'").join("'") + ";p.push('";
+                        })
+                        + "');return p.join('');";
+
+                var args = [];
                 for (var x in tpl_data) {
-                        args.push(x);
+                    args.push(x);
                 }
                 f.cache[scope] = new Function(args, strFunc);
             }
-                       
+
             var args_value = [];
             for (var x in tpl_data) {
                 args_value.push(tpl_data[x]);
             }
-           
+
             return f.cache[scope].apply(this, args_value);
         } catch (e) {
             err = e.message;
         }
-        return "< # ERROR: " + err + scope + "-- ok # >";
+        return "< # $4p.template ERROR: "  + scope + ' '+ err  + "-- ok # >";
     };
-    return f;
-
+    return f;    
 };
 
-$4p.templateData = function(vars, key) {
-    this.vars = {};
+$4p.templateData = function (vars, key) {
+    this.vars = null;
     this.key = null;
     this.i_iterate = null;
     this.i_total = null;
     this.i_position = null;
     this.instanceOfTemplateData = true;
 
-    this.constructor = function(vars, key) {
+    this.constructor = function (vars, key) {
         var k, v;
         this.key = (key) ? key : null;
-        if ( typeof vars === 'undefined' ) {
-          this.vars = null;   
-        } else if (vars.instanceOfTemplateData) {
-            this.vars = vars.vars;
-        } else if ((/boolean|number|string/).test(typeof vars)) {
-            this.vars = vars;
-        } else {
-            for (k in vars) {
-                if (vars.hasOwnProperty(k)) {
-                    v = vars[k];
-                    this.vars[k] = new $4p.templateData(v, k);
-                    // reference the data index
-                    if ( !this[k] ) this[k] = this.vars[k];
 
+        if (vars) {
+            if (vars.instanceOfTemplateData === true) {
+                this.vars = vars.vars;
+            } else if ((/boolean|number|string/).test(typeof vars)) {
+                this.vars = vars;
+            } else {
+                this.vars = {};
+                for (k in vars) {
+                    if (vars.hasOwnProperty(k)) {
+                        v = vars[k];
+                        this.vars[k] = new $4p.templateData(v, k);
+                        // reference the data index
+                        if (!this[k])
+                            this[k] = this.vars[k];
+                    }
                 }
             }
         }
     };
+
     this.constructor.call(this, vars, key);
 
-    this.is = function(args) {
+    this.is = function (args) {
         if (!(args instanceof Array))
             args = Array.prototype.slice.call(arguments);
         var o = this;
@@ -137,108 +149,114 @@ $4p.templateData = function(vars, key) {
         return o;
     };
 
-    this.value = function() {
+    this.value = function () {
         return this.vars;
     };
-    this.v = function() {
+    this.v = function () {
         return this.value();
     };
-    this.e = function() {
+    this.e = function () {
         return this.value();
     };
-    
+
     this.toString = function () {
-      return this.value();  
+        return this.value() + '';
+    };
+
+    this.valueOf = function () {
+        return this.value() + '';
     };
 
     /*
      * ITERATOR
      */
-    this.currentKey = 0;
-    if ( this.vars && this.vars.instanceOfTemplateData) {
-        this.keys = this.vars.keys;        
-    } else {
-        this.keys = [];
-        for ( var key in this.vars) {
-            if (this.vars.hasOwnProperty(key)) {
-                this.keys.push(key);
-            }
-        }
-    }
-
-    this.end = function() {
-        this.currentKey = (this.keys.length - 1);
-    };
-    this.reset = function() {
+    if (this.vars !== null && typeof this.vars === 'object') {
         this.currentKey = 0;
-    };
-    this.prev = function() {
-        return this.vars[this.keys[--this.currentKey]];
-    };
-    this.next = function() {
-        return this.vars[this.keys[++this.currentKey]];
-    };
-    this.count = function() {
-        return this.keys.length;
-    };
-    this.current = function() {
-        return this.vars[this.keys[this.currentKey]];
-    };
-    this.iteratePosition = function() {
-        if (this.i_position === null)
-            return this.i_position = this.i_total - this.i_iterate;
-        return this.i_position;
-    };
-
-    this.iterate = function(nb, offset, rewind) {
-        var nb = (nb) ? nb : null;
-        var offset = (offset) ? offset : null;
-        var rewind = (rewind) ? rewind : false;
-
-        if (!this.instanceOfTemplateData)
-            return null;
-        if ((/boolean|number|string/).test(typeof this.vars))
-            return null;
-        if (this.i_iterate == null) {
-            if (rewind) {
-                this.end();
-            } else {
-                this.reset();
-            }
-            if (offset) {
-                if (offset > this.count()) {
-                    return null;
-                } else {
-                    for ( var i = 0; i != offset; i++) {
-                        if (rewind)
-                            this.prev();
-                        else
-                            this.next();
-                    }
+        if (!this.vars.instanceOfTemplateData) {
+            this.keys = [];
+            for (var key in this.vars) {
+                if (this.vars.hasOwnProperty(key)) {
+                    this.keys.push(key);
                 }
             }
-            if (nb === null) {
-                this.i_total = this.count();
-                this.i_iterate = this.i_total + 1;
-            } else {
-                this.i_iterate = nb + 1;
-                this.i_total = nb;
-            }
+        } else {
+            this.keys = this.vars.keys;
         }
-        this.i_iterate--;
-        this.i_position = null;
-        var a;
-        if (this.i_iterate > 0 && (a = this.current())) {
-            if (!rewind)
-                this.next();
-            else
-                this.prev();
-            a.i_position = this.iteratePosition();
-            return a;
-        }
-        this.i_total = this.i_iterate = null;
-        this.reset();
- };
 
+        this.end = function () {
+            this.currentKey = (this.keys.length - 1);
+        };
+        this.reset = function () {
+            this.currentKey = 0;
+        };
+        this.prev = function () {
+            return this.vars[this.keys[--this.currentKey]];
+        };
+        this.next = function () {
+            return this.vars[this.keys[++this.currentKey]];
+        };
+        this.count = function () {
+            return this.keys.length;
+        };
+        this.current = function () {
+            return this.vars[this.keys[this.currentKey]];
+        };
+        this.iteratePosition = function () {
+            if (this.i_position === null)
+                return this.i_position = this.i_total - this.i_iterate;
+            return this.i_position;
+        };
+
+        this.iterate = function (nb, offset, rewind) {
+            var nb = (nb) ? nb : null;
+            var offset = (offset) ? offset : null;
+            var rewind = (rewind) ? rewind : false;
+
+            if (!this.instanceOfTemplateData)
+                return null;
+            if ((/boolean|number|string/).test(typeof this.vars))
+                return null;
+            if (this.i_iterate == null) {
+                if (rewind) {
+                    this.end();
+                } else {
+                    this.reset();
+                }
+                if (offset) {
+                    if (offset > this.count()) {
+                        return null;
+                    } else {
+                        for (var i = 0; i != offset; i++) {
+                            if (rewind)
+                                this.prev();
+                            else
+                                this.next();
+                        }
+                    }
+                }
+                if (nb === null) {
+                    this.i_total = this.count();
+                    this.i_iterate = this.i_total + 1;
+                } else {
+                    this.i_iterate = nb + 1;
+                    this.i_total = nb;
+                }
+            }
+            this.i_iterate--;
+            this.i_position = null;
+            var a;
+            if (this.i_iterate > 0 && (a = this.current())) {
+                if (!rewind)
+                    this.next();
+                else
+                    this.prev();
+                a.i_position = this.iteratePosition();
+                return a;
+            }
+            this.i_total = this.i_iterate = null;
+            this.reset();
+        };
+    }
 };
+
 exports = module.exports = $4p;

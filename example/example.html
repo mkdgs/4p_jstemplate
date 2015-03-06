@@ -1,61 +1,61 @@
-// need jquery & 4p template libs
-
 <div id="template">    
     https//github.com/mkdgs/4p_jstemplate/
     <br/>
-    <br/>
-    <b>short print: {{=data.is('bar').v() }} </b><br/>
-    <b>traverse data tree: {{=data.is('deep','foo','bar').v() }} </b>
-    <br/>
-    <h1>iterate loop</h1>
+    
+    <h1>Short syntaxe</h1>
+    
+    short print: <b>{{=data.bar }}</b> <br/>
+    traverse data tree safely with is(): <b>{{=data.is('deep','foo','bar') }}</b>   <br/>
+    don't worry about defined data: {{=data.is('not','exist') }} <b>if not exist nothing append</b><br/>
+    make a loop: 
     <ul>
-        <script> 
+        {{ while ( item = data.list.iterate() ) { }}
+        <li>
+              {{=item}}               
+        </li>        
+        {{ } }}
+    </ul>
+    
+    <br/>
+    
+    <h1>iterate loop</h1>
+    and keep working your syntaxe highlight
+    <ul>
+        <script>
+        /* script tag, instead of mustache-like syntax, is convenient for example when you want syntax highlight */
         while ( l = data.is('list').iterate() ) {
-            print('<li> '+l.v()+' </li>');           
+            print('<li> '+l.v()+' </li>'); 
         } 
         </script>
     </ul>
     
    
-    break code déclaration
-    <h1>iterate loop</h1>
+    <h1>more complex iterate loop</h1>
     <button id="add">add item</button>
     <ul>
         <script> while ( loopdata = data.is('list').iterate() ) { </script>
-            <li data-fp-scope="scoped-part"> some html  code ...
+            <li id="{{=loopdata.v()}}" data-fp-scope="scoped-part"> some html  code ...
               {{=loopdata.v()}}
             </li>           
         <script> } </script>        
     </ul>
-    
-    <br />
-    
-    <h1>Alternative syntaxe</h1>
-    <ul>
-        {{ while ( l = data.is('list').iterate() ) { }}
-        <li>
-              {{=l.v()}}  
-        </li>        
-        {{ } }}
-    </ul>
 <div>
-
-<script>
-
+    
+<script type="text/javascript">
 $(function(){
     var template_data = {
-        bar : 'youpi',
-        deep : { 'foo' : { 'bar' : 'data' } },
+        bar : 'hello world',
+        deep : { 'foo' : { 'bar' : 'this data is in deep.foo.bar' } },
         list : [ 'hop', 'hip', 'hap', 'yip' , 'yep']
     };
 
     $(function () {
-        var my_tpl = $4p.tpl($('#template').html());
+        var my_tpl = $4p.template($('#template').html());
         $('#template').html(my_tpl.render(template_data));
     
         $(document).on('click', '#add', function () {
-            $('[data-fp-scope=scoped-part]').first().before(my_tpl.render('awesome data !', 'scoped-part', 'loopdata'));
+            $('[data-fp-scope-parent=scoped-part]').first().append(my_tpl.render('awesome data !', 'scoped-part', 'loopdata'));
         });
     });
 });
-</script>
+</script> 
