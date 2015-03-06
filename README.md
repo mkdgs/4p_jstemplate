@@ -7,8 +7,7 @@ http://jsfiddle.net/mkdgs/FvBnX/
 i've made this template engine, with some idea similar to handlebar, but all presentational template logic is in javascript 
 (we have don't need to learn a new template language again) and it's easy to mix html and javascript, like php with html.
 
-I submit this to your eye and your terrible judgement (for the moment it's a proof of concept)
-
+you can reuse your template and define repetitive subpart of it 
 
 in template all data is mapped to a $4p.templateData object and has three method is(), iterate(), v()
 
@@ -30,7 +29,7 @@ return the data value passed in template contained in this object
 give me a feedback  ;)
 
 
-now work with node Js ! 
+now work with Express/NodeJs ! 
 stuff in node_js/
 ```
 // set template engine for express on node Js
