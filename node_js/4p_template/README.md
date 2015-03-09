@@ -2,7 +2,7 @@
 =============
 [![4p Logo](https://oupla.bienla.com/mkdgs/4p_logo.png)](http://mkdgs.fr/)
 
-Important if you use NodeJs
+Important if you use NodeJs, jsdom 3.1.2 is required
 ===
 
 ```bash
@@ -16,25 +16,38 @@ https://github.com/UncoolAJ86/node-jquery
 https://www.npmjs.com/package/jsdom
 
 
-
 ```
-// set template engine for express on nodeJs
+    /* GET home page. */
+    router.get('/', function(req, res) {
+        var file = 'views/index.html'; // our template file template
+        fs.readFile(file, function (err, content) {
+            if (err) throw err;
 
-var $4p_template = require('4p_template');
+            // init template
+            var tpl = $4p_template.template(content.toString()); 
 
-// view engine setup
-var fs = require('fs'); // this engine requires the fs module
-app.engine('html', function (filePath, options, callback) { // define the template engine
-  fs.readFile(filePath, function (err, content) {
-    if (err) throw new Error(err);
-    
-     var my_tpl = $4p_template.template(content.toString());
-     var rendered = my_tpl.render(options);
-     return callback(null, rendered);
-  });
-});
-app.set('views', path.join(__dirname, 'views')); // specify the views directory
-app.set('view engine', 'html'); // register the template engine
+            // some data
+            var template_data = { 
+                bar: 'hello world',
+                deep: {'foo': {'bar': 'this data is in deep.foo.bar'}},
+                list: ['hop', 'hip', 'hap', 'yip', 'yep']
+            };     
+
+            t = tpl.element.html(tpl.render(template_data)); // render to dom
+
+            // tpl.element is a jquery instance of our template element
+            tpl.element.find('li').css('color', 'red'); // play with it !
+
+            // handle more complex structure and play with dom
+            tpl.renderAfter('table', ''); // render <table>
+            for (i = 1; i <= 11; i++) {
+                tpl.renderAfter('table-line', {cell: [i, i * i]});  // push rendered data in table                
+            }
+
+            var rendered = t.html(); // get html
+            res.send(t.html()); // send output     
+        });
+    };
 ```
 
 test it:
