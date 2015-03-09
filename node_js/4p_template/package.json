@@ -1,6 +1,6 @@
 {
   "name": "4p_template",
-  "version": "0.3.2",
+  "version": "0.4",
   "keywords": "template",
   "description": "A template Engine for Express/NodeJs",
   "repository" :

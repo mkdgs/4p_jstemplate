@@ -6,7 +6,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
 var $4p_template = require('4p_template');
-var routes = require('./route_index');
+var routes = require('./routes/index');
 
 
 var app = express();

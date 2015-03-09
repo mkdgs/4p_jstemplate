@@ -1,49 +1,71 @@
 /*
  * 4p javascript template ports 
- * version : 0.3
+ * version : 0.4
  * Copyright Desgranges Mickael
  * mickael@mkdgs.fr
  */
 if (typeof $4p !== 'object')
     var $4p = {};
+
 $4p.template = function (tpl) {
     var f = {};
-    if (typeof tpl == 'string') {
-        if (tpl.substring(0, 4) == 'http') {
-            $.ajax({
-                cache: true,
-                url: tpl + ( ($4p.skipCache ) ?  $4p.skipCache() : '' ),
-                dataType: 'text',
-                async: false,
-                success: function (d) {
-                    f.tpl = d;
-                }
-            });
-        } else
-            f.tpl = tpl;
-
-    } else {
-        $4p.log('unknow tpl type ' + typeof tpl);
-        return;
-    }
-    // test scope part
-    f.scope = {};
-    f.element = document.createElement('div');
-    f.element.innerHTML = f.tpl;
-    f.element = $(f.element);
-    var $textarea = $('<textarea />');
-    f.element.find('[data-fp-scope]').each(
-            function () {
-                var scope = $(this).attr('data-fp-scope')
-                $(this).parent().attr('data-fp-scope-parent', scope);
-                f.scope[scope] = $textarea.append($(this)).html();                
-                $textarea.html('');
-                if ($(this)[0].hasAttribute('data-fp-remove'))
-                    $(this).remove();                
-            });
-    f.scope['root'] = $textarea.append(f.element).html();
-
     f.cache = {};
+    f.scope = {};
+    
+    f.skipCache = function () {
+        return (typeof $4p.skipCache !== "undefined") ? $4p.skipCache() : '';
+    };
+
+    f.getTemplate = function (tpl) {
+        if (typeof tpl == 'string') {
+            if (tpl.substring(0, 4) == 'http') {
+                $.ajax({
+                    cache: true,
+                    url: tpl + f.skipCache(),
+                    dataType: 'text',
+                    async: false,
+                    success: function (d) {
+                        return d;
+                    }
+                });
+            }
+            return tpl;
+        }
+        f.log('unknow tpl type ' + typeof tpl);
+        return;
+    };
+
+    f.decomposeTemplate = function ($element, scopeObject) {      
+        var scopeObject;
+        if (!scopeObject)
+            scopeObject = f.scope;
+        var $textarea = $('<textarea />');
+        var $nestedParts = $('[data-fp-scope]', $element); 
+         
+        $nestedParts.each(function () {            
+            f.decomposeTemplate($(this), scopeObject);  
+        });            
+              
+        $element.each(function () {              
+            if ( $('[data-fp-scope]', $(this)).length !== 0 ) console.log($(this));
+            var scope = $(this).attr('data-fp-scope');
+            $(this).parent().attr('data-fp-scope-parent', scope);
+            // if (f.scope[scope]) f.log('template part ' + scope + ' has been overwritten');
+            f.scope[scope] = $textarea.append($(this)).html();
+            // if ($(this)[0].hasAttribute('data-fp-remove')) // become useless 
+            $(this).remove();
+            $textarea.html('');            
+        });
+    };
+    
+    f.getParent = function (scope) {
+        return $('[data-fp-scope-parent='+scope+']');
+    };
+    
+    f.renderAfter = function (scope, data, bind_data) {
+        return $(f.render(data, scope, bind_data)).appendTo(f.getParent(scope));
+    };
+    
     f.render = function (data, scope, data_key) {
         var err = "", func;
         if (!scope)
@@ -84,11 +106,22 @@ $4p.template = function (tpl) {
         } catch (e) {
             err = e.message;
         }
-        return "< # $4p.template ERROR: "  + scope + ' '+ err  + "-- ok # >";
+        f.log("$4p.template ERROR: " + scope + ' ' + err);
     };
-    return f;
 
-    
+    f.log = function (msg) {
+        if (typeof console !== "undefined")
+            console.log(msg)
+    };
+
+    f.tpl = f.getTemplate(tpl);
+    // get scope part
+    f.element = document.createElement('div');
+    f.element.innerHTML = f.tpl;
+    f.element = $(f.element).attr('data-fp-scope', 'root');
+    f.decomposeTemplate(f.element);
+
+    return f;
 };
 
 $4p.templateData = function (vars, key) {
