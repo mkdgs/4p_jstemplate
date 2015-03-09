@@ -57,12 +57,14 @@ $4p.template = function (tpl) {
             $textarea.html('');            
         });
     };
-    
+        
     f.getParent = function (scope) {
-        return $('[data-fp-scope-parent='+scope+']');
+        if ( scope === 'root' ) return f.element;
+        return $('[data-fp-scope-parent='+scope+']', f.element);
     };
     
     f.renderAfter = function (scope, data, bind_data) {
+        if ( scope === 'root' ) return f.element;
         return $(f.render(data, scope, bind_data)).appendTo(f.getParent(scope));
     };
     

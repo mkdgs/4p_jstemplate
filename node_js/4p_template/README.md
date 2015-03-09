@@ -2,8 +2,23 @@
 =============
 [![4p Logo](https://oupla.bienla.com/mkdgs/4p_logo.png)](http://mkdgs.fr/)
 
+Important if you use NodeJs
+===
+
+```bash
+npm install -S 'jquery@>=2.1'
+npm install -S 'jsdom@3.1.2'
 ```
-// set template engine for express on node Js
+
+(Note that version 3.1.2 of jsdom is required, because as of jsdom version 4.0.0, jsdom no longer works
+with Node.js.  If you use Io.js rather than Node.js, you can use the latest 4.x release of jsdom.)
+https://github.com/UncoolAJ86/node-jquery
+https://www.npmjs.com/package/jsdom
+
+
+
+```
+// set template engine for express on nodeJs
 
 var $4p_template = require('4p_template');
 

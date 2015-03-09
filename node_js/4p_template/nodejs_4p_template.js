@@ -1,8 +1,9 @@
 // HTML data should be in document creation call 
-var jsdom = require("jsdom"); 
-var document = jsdom.jsdom().parentWindow.document; // data is the html content
+var jsdom = require("jsdom").jsdom;
+var document = jsdom('');
+var window = document.parentWindow;
 
-var $ = require("jquery")(jsdom.jsdom().parentWindow);
+var $ = require("jquery")(window);
 var jQuery = $;
 
 /*
@@ -64,12 +65,14 @@ $4p.template = function (tpl) {
             $textarea.html('');            
         });
     };
-    
+
     f.getParent = function (scope) {
-        return $('[data-fp-scope-parent='+scope+']');
+        if ( scope === 'root' ) return f.element;
+        return $('[data-fp-scope-parent='+scope+']', f.element);
     };
     
     f.renderAfter = function (scope, data, bind_data) {
+        if ( scope === 'root' ) return f.element;
         return $(f.render(data, scope, bind_data)).appendTo(f.getParent(scope));
     };
     
