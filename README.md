@@ -1,10 +1,35 @@
 4p_jstemplate
 =============
 [![4p Logo](https://oupla.bienla.com/mkdgs/4p_logo.png)](http://mkdgs.fr/)
-
-
 test it:
 http://jsfiddle.net/mkdgs/FvBnX/
+
+```
+    var template_data = { // define some data
+        bar: 'hello world',
+        deep: {'foo': {'bar': 'this data is in deep.foo.bar'}},
+        list: ['hop', 'hip', 'hap', 'yip', 'yep']
+    };
+
+    var my_tpl = $4p.template($('#template').html()); // get your template
+    // or something like 
+    // var my_tpl = $4p.template('http://urlOfYour.com/templateFile.html'); 
+    
+    $('#template').html(my_tpl.render(template_data)); // render with data
+
+    $(document).on('click', '#add', function () { // handle button
+        my_tpl.renderAfter('scoped-part', 'awesome data !', 'loopdata');
+        // equivalent to:  
+        // $('[data-fp-scope-parent=scoped-part]').first().append(my_tpl.render('awesome data !', 'scoped-part', 'loopdata'));
+    });
+
+    // handle more complex structure
+    my_tpl.renderAfter('table', ''); // render <table>
+    for (i = 1; i <= 11; i++) {
+        my_tpl.renderAfter('table-line', { cell: [i, i*i]});  // push rendered data in table                
+    }
+
+```
 
 i've made this template engine, with some idea similar to handlebar, but all presentational template logic is in javascript 
 (we have don't need to learn a new template language again) and it's easy to mix html and javascript, like php with html.

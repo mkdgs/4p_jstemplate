@@ -79,14 +79,12 @@
                 var my_tpl = $4p.template($('#template').html()); // get template code
                 $('#template').html(my_tpl.render(template_data)); // render with data
 
-
                 $(document).on('click', '#add', function () { // handle button
-                    my_tpl.renderAfter('scoped-part', 'awesome data !', 'loopdata')
+                    my_tpl.renderAfter('scoped-part', 'awesome data !', 'loopdata');
                     // equivalent to:  
                     // $('[data-fp-scope-parent=scoped-part]').first().append(my_tpl.render('awesome data !', 'scoped-part', 'loopdata'));
                 });
-                
-                
+                                
                 // handle more complex structure
                 my_tpl.renderAfter('table', ''); // render <table>
                 for (i = 1; i <= 11; i++) {
