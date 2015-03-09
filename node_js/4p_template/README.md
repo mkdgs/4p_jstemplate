@@ -16,7 +16,7 @@ https://github.com/UncoolAJ86/node-jquery
 https://www.npmjs.com/package/jsdom
 
 
-```
+```javascript
     /* GET home page. */
     router.get('/', function(req, res) {
         var file = 'views/index.html'; // our template file template

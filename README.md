@@ -5,10 +5,22 @@
 test it:
 http://jsfiddle.net/mkdgs/FvBnX/
 
+```html
+    <h1>{{=data.bar.v()}}</h1>
+    <ul>
+        {{ while ( item = data.list.iterate() ) { }}
+        <li>
+            {{=item}}               
+        </li>        
+        {{ } }}
+    </ul>
 ```
+
+
+
+```javascript
     var template_data = { // define some data
-        bar: 'hello world',
-        deep: {'foo': {'bar': 'this data is in deep.foo.bar'}},
+        bar: 'hello world',       
         list: ['hop', 'hip', 'hap', 'yip', 'yep']
     };
 
@@ -17,27 +29,12 @@ http://jsfiddle.net/mkdgs/FvBnX/
     // var my_tpl = $4p.template('http://urlOfYour.com/templateFile.html'); 
     
     $('#template').html(my_tpl.render(template_data)); // render with data
-
-    $(document).on('click', '#add', function () { // handle button
-        my_tpl.renderAfter('scoped-part', 'awesome data !', 'loopdata');
-        // equivalent to:  
-        // $('[data-fp-scope-parent=scoped-part]').first().append(my_tpl.render('awesome data !', 'scoped-part', 'loopdata'));
-    });
-
-    // handle more complex structure
-    my_tpl.renderAfter('table', ''); // render <table>
-    for (i = 1; i <= 11; i++) {
-        my_tpl.renderAfter('table-line', { cell: [i, i*i]});  // push rendered data in table                
-    }
-
 ```
 
-i've made this template engine, with some idea similar to handlebar, but all presentational template logic is in javascript 
-(we have don't need to learn a new template language again) and it's easy to mix html and javascript, like php with html.
+see example/example.html
 
-you can reuse your template and define repetitive subpart of it.
-
-in template all data is mapped to a $4p.templateData object and has three method is(), iterate(), v()
+- you can reuse your template and define repetitive subpart of it.
+- in template all data is mapped to a $4p.templateData object and has three method is(), iterate(), v()
 
 **$4p.templateData object**
 can contain value mixed value scalar, array, or object 
@@ -54,29 +51,49 @@ is used to make a loop throught $4p.templateData object if it's contain object o
 **v()**
 return the data value passed in template contained in this object
 
+
+i've made this template engine, with some idea similar to handlebar, but all presentational template logic is in javascript 
+(we have don't need to learn a new template language again) and it's easy to mix html and javascript, like php with html.
+
 give me a feedback  ;)
 
 
-now work with Express/NodeJs ! 
-stuff in node_js/
-```
-// set template engine for express on node Js
+**working with Express/NodeJs**
+https://www.npmjs.com/package/4p_template
 
-var $4p_template = require('4p_template');
+find npm package in node_js/
+see example/Express/
+```javascript
+router.get('/', function(req, res) {
+    var file = 'views/index.html'; // our template file template
+    fs.readFile(file, function (err, content) {
+        if (err) throw err;
+       
+        // init template
+        var tpl = $4p_template.template(content.toString()); 
+        
+        // some data
+        var template_data = { 
+            bar: 'hello world',
+            deep: {'foo': {'bar': 'this data is in deep.foo.bar'}},
+            list: ['hop', 'hip', 'hap', 'yip', 'yep']
+        };     
+        
+        t = tpl.element.html(tpl.render(template_data)); // render to dom
+        
+        // tpl.element is a jquery instance of our template element
+        tpl.element.find('li').css('color', 'red'); // play with it !
 
-// view engine setup
-var fs = require('fs'); // this engine requires the fs module
-app.engine('html', function (filePath, options, callback) { // define the template engine
-  fs.readFile(filePath, function (err, content) {
-    if (err) throw new Error(err);
-    
-     var my_tpl = $4p_template.template(content.toString());
-     var rendered = my_tpl.render(options);
-     return callback(null, rendered);
-  });
+        // handle more complex structure and play with dom
+        tpl.renderAfter('table', ''); // render <table>
+        for (i = 1; i <= 11; i++) {
+            tpl.renderAfter('table-line', {cell: [i, i * i]});  // push rendered data in table                
+        }
+        
+        var rendered = t.html(); // get html
+        res.send(t.html()); // send output     
+    });
 });
-app.set('views', path.join(__dirname, 'views')); // specify the views directory
-app.set('view engine', 'html'); // register the template engine
 ```
 
 The templating part is inspired, like many other, from our Guru:
