@@ -184,9 +184,6 @@ $4p.templateData = function (vars, key) {
         return o;
     };
 
-    this.value = function () {
-        return this.vars;
-    };
     this.v = function () {
         return this.value();
     };
