@@ -137,11 +137,12 @@ $4p.templateData = function (vars, key) {
     this.constructor = function (vars, key) {
         var k, v;
         this.key = (key) ? key : null;
-
-        if (vars) {
+        var varsTypeOf = typeof vars;
+        
+        if ( varsTypeOf !== 'undefined' ) {
             if (vars.instanceOfTemplateData === true) {
                 this.vars = vars.vars;
-            } else if ((/boolean|number|string/).test(typeof vars)) {
+            } else if ((/boolean|number|string/).test(varsTypeOf)) {
                 this.vars = vars;
             } else {
                 this.vars = {};
@@ -157,7 +158,7 @@ $4p.templateData = function (vars, key) {
             }
         }
     };
-
+    
     this.constructor.call(this, vars, key);
 
     this.is = function (args) {
