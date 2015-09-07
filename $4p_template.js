@@ -1,6 +1,6 @@
 /*
  * 4p javascript template ports 
- * version : 0.5
+ * version : 0.6
  * Copyright Desgranges Mickael
  * mickael@mkdgs.fr
  */
@@ -11,7 +11,7 @@ $4p.template = function (tpl) {
     var f = {};
     f.cache = {};
     f.scope = {};
-    
+
     f.skipCache = function () {
         return (typeof $4p.skipCache !== "undefined") ? $4p.skipCache() : '';
     };
@@ -35,40 +35,49 @@ $4p.template = function (tpl) {
         return;
     };
 
-    f.decomposeTemplate = function ($element, scopeObject) {      
+    f.decomposeTemplate = function ($element, scopeObject) {
         var scopeObject;
         if (!scopeObject)
             scopeObject = f.scope;
         var $textarea = $('<textarea />');
-        var $nestedParts = $('[data-fp-scope]', $element); 
-         
-        $nestedParts.each(function () {            
-            f.decomposeTemplate($(this), scopeObject);  
-        });            
-              
-        $element.each(function () {              
-            if ( $('[data-fp-scope]', $(this)).length !== 0 ) console.log($(this));
+        var $nestedParts = $('[data-fp-scope]', $element);
+
+        $nestedParts.each(function () {
+            f.decomposeTemplate($(this), scopeObject);
+        });
+
+        $element.each(function () {
+            if ($('[data-fp-scope]', $(this)).length !== 0)
+                console.log($(this));
             var scope = $(this).attr('data-fp-scope');
             $(this).parent().attr('data-fp-scope-parent', scope);
             // if (f.scope[scope]) f.log('template part ' + scope + ' has been overwritten');
             f.scope[scope] = $textarea.append($(this)).html();
             // if ($(this)[0].hasAttribute('data-fp-remove')) // become useless 
             $(this).remove();
-            $textarea.html('');            
+            $textarea.html('');
         });
+
+        $('[data-fp-scope-hide]', $nestedParts).remove();
     };
-        
+
     f.getParent = function (scope) {
-        if ( scope === 'root' ) return f.element;
-        return $('[data-fp-scope-parent='+scope+']', f.element);
+        if (scope === 'root')
+            return f.element;
+        return $('[data-fp-scope-parent=' + scope + ']', f.element);
     };
-    
+
     f.renderAfter = function (scope, data, bind_data) {
-        if ( scope === 'root' ) return f.element;
+        if (scope === 'root')
+            return f.element;
         return $(f.render(data, scope, bind_data)).appendTo(f.getParent(scope));
     };
-    
-    f.render = function (data, scope, data_key) {
+
+    f.use = function (data, scope, data_key, misc_data) {
+        $4p.templateData.print(f.render(data, scope, data_key, misc_data));
+    };
+
+    f.render = function (data, scope, data_key, misc_data) {
         var err = "", func;
         if (!scope)
             scope = 'root';
@@ -76,9 +85,16 @@ $4p.template = function (tpl) {
             data_key = 'data';
         var tpl_data = {};
         tpl_data[data_key] = new $4p.templateData(data);
+
+        if (typeof misc_data === 'object') {
+            for (km in misc_data) {
+                tpl_data[km] = new $4p.templateData(misc_data[km]);
+            }
+        }
+
         try {
             if (typeof f.cache[scope] != 'function') {
-                var strFunc = "var p=[]; var print = function(str) { p.push(str); }; $4p.template.print=print; p.push('"
+                var strFunc = "var p=[]; var use=tpl.use; var print = function(str) { p.push(str); }; var hold_print=$4p.templateData.print; $4p.templateData.print=tpl.print=print; p.push('"
                         + f.scope[scope].replace(/[\r\t\n]/g, " ")
                         .split("'")
                         .join("\\'")
@@ -90,20 +106,19 @@ $4p.template = function (tpl) {
                         .replace(/{{(.+?)}}/g, function (m, p1) {
                             return "');" + p1.split("\\'").join("'") + ";p.push('";
                         })
-                        + "');return p.join('');";
+                        + "');$4p.templateData.print = hold_print;return p.join('');";
 
-                var args = [];
+                var args = ['tpl'];
                 for (var x in tpl_data) {
                     args.push(x);
                 }
                 f.cache[scope] = new Function(args, strFunc);
             }
 
-            var args_value = [];
+            var args_value = [this];
             for (var x in tpl_data) {
                 args_value.push(tpl_data[x]);
             }
-
             return f.cache[scope].apply(this, args_value);
         } catch (e) {
             err = e.message;
@@ -115,9 +130,9 @@ $4p.template = function (tpl) {
         if (typeof console !== "undefined")
             console.log(msg)
     };
-    
+
     f.print = function (str) {
-        f.log('print: '+ str);
+        f.log('print: ' + str);
     };
 
     f.tpl = f.getTemplate(tpl);
@@ -142,8 +157,8 @@ $4p.templateData = function (vars, key) {
         var k, v;
         this.key = (key) ? key : null;
         var varsTypeOf = typeof vars;
-        
-        if ( varsTypeOf !== 'undefined' ) {
+
+        if (varsTypeOf !== 'undefined') {
             if (vars.instanceOfTemplateData === true) {
                 this.vars = vars.vars;
             } else if ((/boolean|number|string/).test(varsTypeOf)) {
@@ -162,7 +177,7 @@ $4p.templateData = function (vars, key) {
             }
         }
     };
-    
+
     this.constructor.call(this, vars, key);
 
     this.is = function (args) {
@@ -188,7 +203,7 @@ $4p.templateData = function (vars, key) {
         return this.vars;
     };
     this.e = function () {
-        return $4p.template.print(this.v());
+        return $4p.templateData.print(this.v());
     };
 
     this.toString = function () {
@@ -198,6 +213,7 @@ $4p.templateData = function (vars, key) {
     this.valueOf = function () {
         return this.v() + '';
     };
+
 
     /*
      * ITERATOR
@@ -289,4 +305,5 @@ $4p.templateData = function (vars, key) {
             this.reset();
         };
     }
+    
 };
