@@ -185,7 +185,7 @@ $4p.templateData = function (vars, key) {
     };
 
     this.v = function () {
-        return this.value();
+        return this.vars;
     };
     this.e = function () {
         return $4p.template.print(this.value());
