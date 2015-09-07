@@ -116,7 +116,7 @@ $4p.template = function (tpl) {
             console.log(msg)
     };
     
-    f.print = function (str) {
+    f.print = function (str) {
         f.log('print: '+ str);
     };
 
@@ -188,15 +188,15 @@ $4p.templateData = function (vars, key) {
         return this.vars;
     };
     this.e = function () {
-        return $4p.template.print(this.value());
+        return $4p.template.print(this.v());
     };
 
     this.toString = function () {
-        return this.value() + '';
+        return this.v() + '';
     };
 
     this.valueOf = function () {
-        return this.value() + '';
+        return this.v() + '';
     };
 
     /*
