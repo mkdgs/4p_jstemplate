@@ -1,6 +1,6 @@
 /*
  * 4p javascript template ports 
- * version : 0.4
+ * version : 0.5
  * Copyright Desgranges Mickael
  * mickael@mkdgs.fr
  */
@@ -78,7 +78,7 @@ $4p.template = function (tpl) {
         tpl_data[data_key] = new $4p.templateData(data);
         try {
             if (typeof f.cache[scope] != 'function') {
-                var strFunc = "var p=[]; var print = function(str) { p.push(str); }; p.push('"
+                var strFunc = "var p=[]; var print = function(str) { p.push(str); }; $4p.template.print=print; p.push('"
                         + f.scope[scope].replace(/[\r\t\n]/g, " ")
                         .split("'")
                         .join("\\'")
@@ -114,6 +114,10 @@ $4p.template = function (tpl) {
     f.log = function (msg) {
         if (typeof console !== "undefined")
             console.log(msg)
+    };
+    
+    f.print = function (str) {
+        f.log('print: '+ str);
     };
 
     f.tpl = f.getTemplate(tpl);
@@ -187,7 +191,7 @@ $4p.templateData = function (vars, key) {
         return this.value();
     };
     this.e = function () {
-        return this.value();
+        return $4p.template.print(this.value());
     };
 
     this.toString = function () {
