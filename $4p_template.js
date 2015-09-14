@@ -103,7 +103,7 @@ $4p.template = function (tpl) {
                         .replace(/{{=([^}{2}]+)}}/g, function (m, p1) {
                             return "'+" + p1.split("\\'").join("'") + "+'";
                         })
-                        .replace(/{{(.+?)}}/g, function (m, p1) {
+                        .replace(/{{([^}{2}]+)}}/g, function (m, p1) {
                             return "');" + p1.split("\\'").join("'") + ";p.push('";
                         })
                         + "');$4p.templateData.print = hold_print;return p.join('');";
