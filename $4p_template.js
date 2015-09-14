@@ -100,7 +100,7 @@ $4p.template = function (tpl) {
                         .join("\\'")
                         .replace(/<script>/g, "{{")
                         .replace(/<\/script>/g, "}}")
-                        .replace(/{{(.*?)}}/g, function (m, p1) {
+                        .replace(/{{=(.*?)}}/g, function (m, p1) {
                             return "'+" + p1.split("\\'").join("'") + "+'";
                         })
                         .replace(/{{(.*?)}}/g, function (m, p1) {
