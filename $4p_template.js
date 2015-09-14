@@ -100,10 +100,10 @@ $4p.template = function (tpl) {
                         .join("\\'")
                         .replace(/<script>/g, "{{")
                         .replace(/<\/script>/g, "}}")
-                        .replace(/{{=([^}{2}]+)}}/g, function (m, p1) {
+                        .replace(/{{(.*?)}}/g, function (m, p1) {
                             return "'+" + p1.split("\\'").join("'") + "+'";
                         })
-                        .replace(/{{([^}{2}]+)}}/g, function (m, p1) {
+                        .replace(/{{(.*?)}}/g, function (m, p1) {
                             return "');" + p1.split("\\'").join("'") + ";p.push('";
                         })
                         + "');$4p.templateData.print = hold_print;return p.join('');";
