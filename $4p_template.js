@@ -8,6 +8,7 @@ if (typeof $4p !== 'object')
     var $4p = {};
 
 $4p.template = function (tpl) {
+    var $ = jQuery;
     var f = {};
     f.cache = {};
     f.scope = {};
